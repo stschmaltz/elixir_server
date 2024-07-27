@@ -1,18 +1,7 @@
 defmodule ElixirServer do
-  @moduledoc """
-  Documentation for `ElixirServer`.
-  """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> ElixirServer.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def hello(name) do
+    "Hello #{name}"
   end
 end
+
+IO.puts ElixirServer.hello("world")
