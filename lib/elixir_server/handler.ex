@@ -3,7 +3,9 @@ defmodule ElixirServer.Handler do
     request
     |> parse
     |> log
+    |> rewrite_path
     |> route
+    |> track
     |> format_response
   end
 
@@ -19,28 +21,60 @@ defmodule ElixirServer.Handler do
     %{method: method, path: path, resp_body: "", status: nil}
   end
 
-  def route(conversation) do
-    route(conversation, conversation.method, conversation.path)
+  def rewrite_path(%{path: "/wildlife"} = conversation) do
+    %{conversation | path: "/wildthings"}
   end
 
-  def route(conversation, "GET", "/wildthings") do
+  def rewrite_path(conversation) do
+    conversation
+  end
+
+  def route(%{method: "GET", path: "/wildthings"} = conversation) do
     %{conversation | resp_body: "Bears, Lions, Tigers", status: 200}
   end
 
-  def route(conversation, "GET", "/bears") do
+  def route(%{method: "GET", path: "/bears"} = conversation) do
     %{conversation | resp_body: "Teddy, Smokey, Paddington", status: 200}
   end
 
-  def route(conversation, "GET", "/bears" <> id) do
+  def route(%{method: "GET", path: "/bears" <> id} = conversation) do
     %{conversation | resp_body: "Bear #{id}", status: 200}
   end
 
-  def route(conversation, _method, _path) do
+  def route(%{method: "GET", path: "/about"} = conversation) do
+    file =
+      Path.expand("../../pages", __DIR__)
+      |> Path.join("about.html")
+      |> File.read()
+      |> handle_file(conversation)
+  end
+
+  def handle_file({:ok, contents}, conversation) do
+    %{conversation | resp_body: contents, status: 200}
+  end
+
+  def handle_file({:error, :enoent}, conversation) do
+    %{conversation | resp_body: "File not found", status: 404}
+  end
+
+  def handle_file({:error, reason}, conversation) do
+    %{conversation | resp_body: "File error #{reason}", status: 500}
+  end
+
+  def route(%{path: path} = conversation) do
     %{conversation | resp_body: "Route not found", status: 404}
   end
 
+  def track(%{status: 404, path: path} = conversation) do
+    IO.puts("Tracking: #{conversation.path}")
+    conversation
+  end
+
+  def track(conversation) do
+    conversation
+  end
+
   def format_response(conversation) do
-    # TODO: Use values in the map to create an HTTP response string:
     """
     HTTP/1.1 #{conversation.status} #{status_reason(conversation.status)}
     Content-Type: text/html
@@ -88,6 +122,20 @@ IO.puts(response)
 
 request = """
 GET /bears/1 HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = ElixirServer.Handler.handle(request)
+
+IO.puts(response)
+
+# GET /about
+
+request = """
+GET /about HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
