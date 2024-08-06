@@ -3,7 +3,8 @@ defmodule ElixirServer.Conversation do
             path: "",
             resp_body: "",
             status: nil,
-            params: %{}
+            params: %{},
+            headers: %{}
 
   def full_status(conversation) do
     "#{conversation.status} #{status_reason(conversation.status)}"
