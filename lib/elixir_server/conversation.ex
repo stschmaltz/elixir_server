@@ -1,5 +1,9 @@
 defmodule ElixirServer.Conversation do
-  defstruct method: "", path: "", resp_body: "", status: nil
+  defstruct method: "",
+            path: "",
+            resp_body: "",
+            status: nil,
+            params: %{}
 
   def full_status(conversation) do
     "#{conversation.status} #{status_reason(conversation.status)}"

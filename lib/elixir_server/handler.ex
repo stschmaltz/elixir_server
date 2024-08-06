@@ -35,6 +35,14 @@ defmodule ElixirServer.Handler do
     %{conversation | resp_body: "Bear #{id}", status: 200}
   end
 
+  def route(%Conversation{method: "POST", path: "/bears", params: params} = conversation) do
+    %{
+      conversation
+      | resp_body: "Created a #{params["type"]} bear named #{params["name"]}!",
+        status: 201
+    }
+  end
+
   def route(%Conversation{path: path} = conversation) do
     %{conversation | resp_body: "Route not found #{path}", status: 404}
   end
@@ -113,6 +121,23 @@ Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
 
+"""
+
+response = ElixirServer.Handler.handle(request)
+
+IO.puts(response)
+
+# POST /bears
+
+request = """
+POST /bears HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 21
+
+name=Baloo&type=Brown
 """
 
 response = ElixirServer.Handler.handle(request)
