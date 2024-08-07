@@ -7,6 +7,7 @@ defmodule ElixirServer.Handler do
   import ElixirServer.Parser, only: [parse: 1]
 
   alias ElixirServer.Conversation
+  alias ElixirServer.BearController
 
   @pages_path Path.expand("../pages", __DIR__)
 
@@ -28,19 +29,17 @@ defmodule ElixirServer.Handler do
   end
 
   def route(%Conversation{method: "GET", path: "/bears"} = conversation) do
-    %{conversation | resp_body: "Teddy, Smokey, Paddington", status: 200}
+    BearController.index(conversation)
   end
 
-  def route(%Conversation{method: "GET", path: "/bears" <> id} = conversation) do
-    %{conversation | resp_body: "Bear #{id}", status: 200}
+  def route(%Conversation{method: "GET", path: "/bears/" <> id} = conversation) do
+    params = Map.put(conversation.params, "id", id)
+
+    BearController.show(conversation, params)
   end
 
   def route(%Conversation{method: "POST", path: "/bears", params: params} = conversation) do
-    %{
-      conversation
-      | resp_body: "Created a #{params["type"]} bear named #{params["name"]}!",
-        status: 201
-    }
+    BearController.create(conversation, params)
   end
 
   def route(%Conversation{path: path} = conversation) do
@@ -90,7 +89,19 @@ response = ElixirServer.Handler.handle(request)
 IO.puts(response)
 
 request = """
-GET /butts HTTP/1.1
+GET /buttz HTTP/1.1
+Host: example.com
+User-Agent: ExampleBrowser/1.0
+Accept: */*
+
+"""
+
+response = ElixirServer.Handler.handle(request)
+
+IO.puts(response)
+
+request = """
+GET /bears HTTP/1.1
 Host: example.com
 User-Agent: ExampleBrowser/1.0
 Accept: */*
