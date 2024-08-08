@@ -174,10 +174,22 @@ defmodule HandlerTest do
      {"type":"Grizzly","name":"Kenai","id":10,"hibernating":false}]
     """
 
-    assert remove_whitespace(response) == remove_whitespace(expected_response)
+    response_body = extract_json_body(response)
+    expected_response_body = extract_json_body(expected_response)
+
+    # Decode JSON strings to maps using Poison
+    {:ok, response_json} = Poison.decode(response_body)
+    {:ok, expected_json} = Poison.decode(expected_response_body)
+
+    assert response_json == expected_json
   end
 
   defp remove_whitespace(text) do
     String.replace(text, ~r{\s}, "")
+  end
+
+  defp extract_json_body(response) do
+    [_, json_body] = String.split(response, "\r\n\r\n", parts: 2)
+    json_body
   end
 end
