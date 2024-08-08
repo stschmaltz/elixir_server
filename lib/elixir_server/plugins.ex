@@ -2,7 +2,10 @@ defmodule ElixirServer.Plugins do
   alias ElixirServer.Conversation
 
   def track(%Conversation{status: 404, path: path} = conversation) do
-    IO.puts("Tracking: #{path}")
+    if Mix.env() != :test do
+      IO.puts("Tracking: #{path}")
+    end
+
     conversation
   end
 
@@ -18,5 +21,11 @@ defmodule ElixirServer.Plugins do
     conversation
   end
 
-  def log(%Conversation{} = conversation), do: IO.inspect(conversation)
+  def log(%Conversation{} = conversation) do
+    if Mix.env() != :test do
+      IO.inspect(conversation)
+    end
+
+    conversation
+  end
 end

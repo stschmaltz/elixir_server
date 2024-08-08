@@ -67,90 +67,11 @@ defmodule ElixirServer.Handler do
 
   def format_response(%Conversation{} = conversation) do
     """
-    HTTP/1.1 #{Conversation.full_status(conversation)}
-    Content-Type: text/html
-    Content-Length: #{conversation.resp_body |> String.length()}
-
-    #{conversation.resp_body}
+    HTTP/1.1 #{Conversation.full_status(conversation)}\r
+    Content-Type: text/html\r
+    Content-Length: #{conversation.resp_body |> String.length()}\r
+    \r
+    #{conversation.resp_body}\r
     """
   end
 end
-
-request = """
-GET /wildthings HTTP/1.1
-Host: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
-
-response = ElixirServer.Handler.handle(request)
-
-IO.puts(response)
-
-request = """
-GET /buttz HTTP/1.1
-Host: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
-
-response = ElixirServer.Handler.handle(request)
-
-IO.puts(response)
-
-request = """
-GET /bears HTTP/1.1
-Host: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
-
-response = ElixirServer.Handler.handle(request)
-
-IO.puts(response)
-
-request = """
-GET /bears/1 HTTP/1.1
-Host: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
-
-response = ElixirServer.Handler.handle(request)
-
-IO.puts(response)
-
-# GET /about
-
-request = """
-GET /about HTTP/1.1
-Host: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-
-"""
-
-response = ElixirServer.Handler.handle(request)
-
-IO.puts(response)
-
-# POST /bears
-
-request = """
-POST /bears HTTP/1.1
-Host: example.com
-User-Agent: ExampleBrowser/1.0
-Accept: */*
-Content-Type: application/x-www-form-urlencoded
-Content-Length: 21
-
-name=Baloo&type=Brown
-"""
-
-response = ElixirServer.Handler.handle(request)
-
-IO.puts(response)
