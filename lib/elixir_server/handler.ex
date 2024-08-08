@@ -32,6 +32,10 @@ defmodule ElixirServer.Handler do
     BearController.index(conversation)
   end
 
+  def route(%Conversation{method: "GET", path: "/api/bears"} = conversation) do
+    ElixirServer.Api.BearController.index(conversation)
+  end
+
   def route(%Conversation{method: "GET", path: "/bears/" <> id} = conversation) do
     params = Map.put(conversation.params, "id", id)
 
@@ -68,10 +72,10 @@ defmodule ElixirServer.Handler do
   def format_response(%Conversation{} = conversation) do
     """
     HTTP/1.1 #{Conversation.full_status(conversation)}\r
-    Content-Type: text/html\r
+    Content-Type: #{conversation.resp_content_type}\r
     Content-Length: #{conversation.resp_body |> String.length()}\r
     \r
-    #{conversation.resp_body}\r
+    #{conversation.resp_body}
     """
   end
 end

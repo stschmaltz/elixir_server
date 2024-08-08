@@ -4,7 +4,8 @@ defmodule ElixirServer.Conversation do
             resp_body: "",
             status: nil,
             params: %{},
-            headers: %{}
+            headers: %{},
+            resp_content_type: "text/html"
 
   def full_status(conversation) do
     "#{conversation.status} #{status_reason(conversation.status)}"
