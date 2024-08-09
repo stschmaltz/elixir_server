@@ -9,7 +9,7 @@ defmodule ElixirServer.Handler do
   alias ElixirServer.Conversation
   alias ElixirServer.BearController
 
-  @pages_path Path.expand("../pages", __DIR__)
+  @pages_path Path.expand("../../pages", __DIR__)
 
   @doc """
   This function handles the request and response of the server.
@@ -46,8 +46,14 @@ defmodule ElixirServer.Handler do
     BearController.create(conversation, params)
   end
 
-  def route(%Conversation{path: path} = conversation) do
-    %{conversation | resp_body: "Route not found #{path}", status: 404}
+  def route(%Conversation{method: "GET", path: "/hibernate/" <> time} = conversation) do
+    time |> String.to_integer() |> :timer.sleep()
+
+    %{conversation | status: 200, resp_body: "Awake!"}
+  end
+
+  def route(%Conversation{method: "GET", path: "/kaboom"} = conversation) do
+    raise "Kaboom!"
   end
 
   def route(%Conversation{method: "GET", path: "/about"} = conversation) do
@@ -55,6 +61,10 @@ defmodule ElixirServer.Handler do
     |> Path.join("about.html")
     |> File.read()
     |> handle_file(conversation)
+  end
+
+  def route(%Conversation{path: path} = conversation) do
+    %{conversation | resp_body: "Route not found #{path}", status: 404}
   end
 
   def handle_file({:ok, contents}, conversation) do
