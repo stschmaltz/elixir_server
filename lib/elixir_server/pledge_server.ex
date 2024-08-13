@@ -27,6 +27,14 @@ defmodule ElixirServer.PledgeServer do
     end
   end
 
+  def total_pledged do
+    send(@process_name, {self(), :total_pledged})
+
+    receive do
+      {:response, total} -> total
+    end
+  end
+
   # Server
 
   def listen_loop(state) do
@@ -35,13 +43,16 @@ defmodule ElixirServer.PledgeServer do
         {:ok, new_pledge_id} = send_pledge_to_service(name, amount)
         most_recent_pledges = Enum.take(state, 2)
         new_state = [{name, amount} | most_recent_pledges]
-
         send(sender, {:response, new_pledge_id})
-
         listen_loop(new_state)
 
       {sender, :recent_pledges} ->
         send(sender, {:response, state})
+        listen_loop(state)
+
+      {sender, :total_pledged} ->
+        total = Enum.map(state, fn {_, amount} -> amount end) |> Enum.sum()
+        send(sender, {:response, total})
         listen_loop(state)
 
       unexpected ->
@@ -50,8 +61,8 @@ defmodule ElixirServer.PledgeServer do
     end
   end
 
-  defp send_pledge_to_service do
+  defp send_pledge_to_service(name, amount) do
     # CODE GOES HERE TO SEND A REQUEST TO THE EXTERNAL API
-    {:ok, "pledge-#{:rand.uniform(1000)}"}
+    {:ok, "pledge-#{:rand.uniform(1000)}-#{name}-#{amount}"}
   end
 end

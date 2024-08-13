@@ -71,6 +71,14 @@ defmodule ElixirServer.Handler do
     raise "Kaboom!"
   end
 
+  def route(%Conversation{method: "POST", path: "/pledges"} = conversation) do
+    ElixirServer.PledgeController.create(conversation, conversation.params)
+  end
+
+  def route(%Conversation{method: "GET", path: "/pledges"} = conversation) do
+    ElixirServer.PledgeController.index(conversation)
+  end
+
   def route(%Conversation{method: "GET", path: "/about"} = conversation) do
     @pages_path
     |> Path.join("about.html")
