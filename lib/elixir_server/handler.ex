@@ -8,8 +8,7 @@ defmodule ElixirServer.Handler do
 
   alias ElixirServer.Conversation
   alias ElixirServer.BearController
-  alias ElixirServer.VideoCam
-  alias ElixirServer.Tracker
+  alias ElixirServer.SensorServer
 
   @pages_path Path.expand("../../pages", __DIR__)
 
@@ -55,16 +54,9 @@ defmodule ElixirServer.Handler do
   end
 
   def route(%Conversation{method: "GET", path: "/sensors"} = conversation) do
-    task = Task.async(fn -> Tracker.get_location("bigfoot") end)
+    sensor_data = SensorServer.get_sensor_data()
 
-    snapshots =
-      ["cam-1", "cam-2", "cam-3"]
-      |> Enum.map(&Task.async(fn -> VideoCam.get_snapshot(&1) end))
-      |> Enum.map(&Task.await/1)
-
-    where_is_bigfoot = Task.await(task)
-
-    %{conversation | status: 200, resp_body: inspect({snapshots, where_is_bigfoot})}
+    %{conversation | status: 200, resp_body: inspect(sensor_data)}
   end
 
   def route(%Conversation{method: "GET", path: "/kaboom"} = _conversation) do
