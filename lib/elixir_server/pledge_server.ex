@@ -9,9 +9,9 @@ defmodule ElixirServer.PledgeServer do
 
   # Client Interface
 
-  def start do
+  def start_link(_args) do
     IO.puts("Starting the pledge server...")
-    GenServer.start(__MODULE__, %State{}, name: @name)
+    GenServer.start_link(__MODULE__, %State{}, name: @name)
   end
 
   def create_pledge(name, amount) do
@@ -85,22 +85,3 @@ defmodule ElixirServer.PledgeServer do
     [{"Wilma", 100}, {"Fred", 200}, {"Barney", 300}]
   end
 end
-
-alias ElixirServer.PledgeServer
-
-{:ok, pid} = PledgeServer.start()
-
-send(pid, {:stop, "hammertime"})
-
-IO.inspect(PledgeServer.create_pledge("larry", 10))
-IO.inspect(PledgeServer.create_pledge("moe", 20))
-IO.inspect(PledgeServer.create_pledge("curly", 30))
-IO.inspect(PledgeServer.create_pledge("daisy", 40))
-
-PledgeServer.clear()
-
-IO.inspect(PledgeServer.create_pledge("grace", 50))
-
-IO.inspect(PledgeServer.recent_pledges())
-
-IO.inspect(PledgeServer.total_pledged())
