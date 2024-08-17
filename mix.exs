@@ -4,6 +4,7 @@ defmodule ElixirServer.MixProject do
   def project do
     [
       app: :elixir_server,
+      description: "An Elixir server application",
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
@@ -14,7 +15,9 @@ defmodule ElixirServer.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {ElixirServer, []},
+      env: [port: 4001]
     ]
   end
 
